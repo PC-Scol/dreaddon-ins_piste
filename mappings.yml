@@ -2,7 +2,7 @@
 
 mappings:
   dossiers_inscription:
-    admission_numero_candidat: choixInscription.0.admission.identifiantAdmis.numeroCandidat
+    admission_numero_candidat: choixInscription.0.admission.identifiantAdmis.numeroCandidat.value
     code_espace: choixInscription.0.periode.code
     lib_contexte: choixInscription.0.cheminInscription.cibleInscriptionRef.chemin
     code_apprenant: apprenant.codeApprenant.value
