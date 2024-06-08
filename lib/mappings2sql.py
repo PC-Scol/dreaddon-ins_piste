@@ -22,8 +22,8 @@ if args.mappings:
     with open(args.mappings[0], "rb") as inf:
         mappings = yaml.load(inf, Loader=yaml.Loader)
 
-source_schema = args.source_schema or "piste_inscription"
-dest_schema = args.dest_schema or "ins_piste"
+source_schema = args.source_schema or "schema_piste_inscription"
+dest_schema = args.dest_schema or "schema_ins_piste"
 
 for (collection, mappings) in mappings["mappings"].items():
     if mappings is None: continue

@@ -2,4 +2,8 @@
 # -*- coding: utf-8 mode: sh -*- vim:sw=4:sts=4:et:ai:si:sta:fenc=utf-8
 MYDIR="$(dirname -- "$0")"
 
-"$MYDIR/../lib/mappings2sql.py" "$MYDIR/../mappings.yml" | psql
+"$MYDIR/../lib/mappings2sql.py" \
+    "$MYDIR/../mappings.yml" \
+    -s schema_piste_inscription \
+    -d schema_ins_piste \
+    | psql
