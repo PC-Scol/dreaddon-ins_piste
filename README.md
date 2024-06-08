@@ -2,7 +2,12 @@
 
 Cet addon crée un schéma `schema_ins_piste` et des extractions à partir du
 schéma `schema_piste_inscription`, en suivant les règles contenues dans le
-fichier `mappings.yml`
+fichier `mappings.yml`:
+* pour chaque table de la clé mappings, la créer dans le schéma
+  `schema_ins_piste` avec une colonne pour chaque mapping.
+* pour chaque table, provisionner les colonnes de la table dans le schéma
+  `schema_ins_piste` avec le chemin calculé à partir de la colonne `source_json`
+  de la table dans le schéma `schema_piste_inscription`
 
 Pour utiliser cet addon, rajouter ceci dans la configuration:
 ~~~sh
