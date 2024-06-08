@@ -1,0 +1,15 @@
+# -*- coding: utf-8 mode: yaml -*- vim:sw=2:sts=2:et:ai:si:sta:fenc=utf-8
+
+mappings:
+  dossiers_inscription:
+    admission_numero_candidat: choixInscription.0.admission.identifiantAdmis.numeroCandidat
+    code_espace: choixInscription.0.periode.code
+    lib_contexte: choixInscription.0.cheminInscription.cibleInscriptionRef.chemin
+    code_apprenant: apprenant.codeApprenant.value
+
+  calendrier:
+    code_calendrier: code
+
+  chemins:
+
+  paiements:
