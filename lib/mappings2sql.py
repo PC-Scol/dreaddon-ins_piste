@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 mode: python -*- vim:sw=4:sts=4:et:ai:si:sta:fenc=utf-8
 
-import os, sys, argparse
+import os, sys, argparse, re
 from os import path
 from urllib.parse import urlparse
 
@@ -13,35 +13,66 @@ parser = argparse.ArgumentParser(
     description="générer le script sql correspondant aux mappings",
 )
 parser.add_argument("mappings", nargs=1, metavar="mappings.yml", help="Fichier de mappings")
-parser.add_argument("-s", "--source-schema", help="Sélectionner le schéma source")
-parser.add_argument("-d", "--dest-schema", help="Sélectionner le schéma destination")
 args = parser.parse_args()
 
-mappings = {}
+data = {}
 if args.mappings:
     with open(args.mappings[0], "rb") as inf:
-        mappings = yaml.load(inf, Loader=yaml.Loader)
+        data = yaml.load(inf, Loader=yaml.Loader)
 
-source_schema = args.source_schema or "schema_piste_inscription"
-dest_schema = args.dest_schema or "schema_ins_piste"
+source_schema = data["schema_source"]
+dest_schema = data["schema_destination"]
 
-for (collection, mappings) in mappings["mappings"].items():
-    if mappings is None: continue
-    cols = mappings.keys()
-    coldefs = ["%s varchar" % col for col in cols]
-    print("create table %s.%s (\n  %s\n);" % (dest_schema, collection, "\n, ".join(coldefs)))
+for (table_name, table) in data["tables"].items():
+    if table is None: continue
+
+    definitions = table.get("definitions", {})
+    mappings = table.get("mappings", {})
+
+    cols = {}
+    for (col, definition) in definitions.items():
+        if not definition: definition = "varchar"
+        mo = re.match(r'(\S+)\s*(\(.*)?', definition)
+        if mo is not None: cast = mo.group(1)
+        else: cast = definition
+        if cast == "varchar": cast = None
+        cols[col] = dict(name=col, definition=definition, cast=cast, mapping=None)
+    for (col, mapping) in mappings.items():
+        if mapping is None: continue
+        if col in cols:
+            cols[col]["mapping"] = mapping
+        else:
+            cols[col] = dict(name=col, definition="varchar", cast=None, mapping=mapping)
+
+    colnames = [col["name"] for col in cols.values()]
+    coldefs = ["%s %s" % (col["name"], col["definition"]) for col in cols.values()]
+    print("create table %s.%s (\n  %s\n);" % (dest_schema, table_name, "\n, ".join(coldefs)))
 
     exprs = []
-    for (col, user_expr) in mappings.items():
+    for col in cols.values():
+        name = col["name"]
+        cast = col["cast"]
+        key = col["mapping"]
+        if key is None: continue
+        if type(key) is dict:
+            sql = key.get("expr", None)
+            key = key["key"]
+        else:
+            sql = None
         expr = ["source_json"]
-        for part in user_expr.split("."):
+        for part in key.split("."):
             if part.isnumeric(): expr.append("->%s" % part)
             else: expr.append("->'%s'" % part)
         expr[-1] = expr[-1].replace("->", "->>")
-        exprs.append("%s as %s" % ("".join(expr), col))
+        expr = "".join(expr)
+        if cast is not None:
+            expr = "(%s)::%s" % (expr, cast)
+        if sql is not None:
+            expr = sql % dict(expr=expr)
+        exprs.append("%s as %s" % (expr, name))
     print("insert into %s.%s (%s) select\n  %s\nfrom %s.%s;" % (
-        dest_schema, collection,
-        ", ".join(cols),
+        dest_schema, table_name,
+        ", ".join(colnames),
         "\n, ".join(exprs),
-        source_schema, collection,
+        source_schema, table_name,
     ))

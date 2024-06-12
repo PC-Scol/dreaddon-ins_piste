@@ -1,15 +1,103 @@
 # -*- coding: utf-8 mode: yaml -*- vim:sw=2:sts=2:et:ai:si:sta:fenc=utf-8
 
-mappings:
-  dossiers_inscription:
-    admission_numero_candidat: choixInscription.0.admission.identifiantAdmis.numeroCandidat.value
-    code_espace: choixInscription.0.periode.code
-    lib_contexte: choixInscription.0.cheminInscription.cibleInscriptionRef.chemin
-    code_apprenant: apprenant.codeApprenant.value
-
-  calendrier:
-    code_calendrier: code
-
-  chemins:
-
-  paiements:
+schema_source: mongo_piste_inscription
+schema_destination: schema_ins_piste
+tables:
+  apprenant:
+    definitions:
+      code_apprenant: varchar
+      est_primo: boolean
+      nom_famille: varchar
+      nom_usuel: varchar
+      prenom: varchar
+      prenom2: varchar
+      prenom3: varchar
+      sexe: varchar
+      date_naissance: date
+      code_pays_naissance: varchar
+      code_commune_naissance: varchar
+      libelle_commune_naissance_etranger: varchar
+      code_nationalite: varchar
+      code_nationalite2: varchar
+      date_obtention_nationalite2: date
+      annee_obtention_bac: integer
+      code_type_ou_serie_bac: varchar
+      code_mention_bac: varchar
+      type_etablissement_bac: varchar
+      code_pays_bac: varchar
+      code_departement_bac: varchar
+      code_etablissement_bac: varchar
+      etablissement_libre_bac: varchar
+      precisions_titre_dispense_bac: varchar
+      ine: varchar
+      annee_entree_enseignement_superieur: integer
+      annee_entree_universite: integer
+      annee_entree_etablissement: integer
+      code_categorie_socioprofessionnelle: varchar
+      code_quotite_travaillee: varchar
+      code_categorie_socioprofessionnelle_parent1: varchar
+      code_categorie_socioprofessionnelle_parent2: varchar
+      code_situation_familiale: varchar
+      nombre_enfants: integer
+      code_situation_militaire: varchar
+      date_creation: timestamp
+      date_modification: timestamp
+      code_premiere_specialite_bac: varchar
+      code_deuxieme_specialite_bac: varchar
+      statut_ine: varchar
+      date_derniere_verification_ine: timestamp
+      code_erreur_ine: varchar
+      message_erreur_ine: varchar
+      temoin_neo_bachelier: boolean
+    mappings:
+      code_apprenant: apprenant.codeApprenant.value
+      est_primo: estPrimo
+      nom_famille: apprenant.etatCivil.nomDeNaissance.value
+      #nom_usuel:
+      prenom: apprenant.etatCivil.prenom.value
+      #prenom2:
+      #prenom3:
+      sexe: apprenant.etatCivil.genre
+      date_naissance: apprenant.etatCivil.dateDeNaissance.value.$date
+      code_pays_naissance: apprenant.etatCivil.paysDeNaissance.code
+      code_commune_naissance: apprenant.etatCivil.communeDeNaissance.code
+      #libelle_commune_naissance_etranger:
+      code_nationalite: apprenant.etatCivil.nationalite.code
+      #code_nationalite2:
+      #date_obtention_nationalite2 date:
+      annee_obtention_bac: apprenant.bac.anneeObtention
+      code_type_ou_serie_bac: apprenant.bac.serie.code
+      code_mention_bac: apprenant.bac.mention.code
+      type_etablissement_bac:
+        key: apprenant.bac.etablissement.type
+        expr: >
+          CASE
+            WHEN %(expr)s = 'ETABLISSEMENT_FRANCAIS' THEN 'F'
+            WHEN %(expr)s IS NULL THEN NULL
+            ELSE 'E'
+          END
+      code_pays_bac: apprenant.bac.etablissement.pays.code
+      code_departement_bac: apprenant.bac.etablissement.departement.code
+      code_etablissement_bac: apprenant.bac.etablissement.numeroUai
+      #etablissement_libre_bac:
+      #precisions_titre_dispense_bac:
+      ine: apprenant.ine.value
+      annee_entree_enseignement_superieur: apprenant.premieresInscriptions.anneeEnseignementSuperieur
+      annee_entree_universite: apprenant.premieresInscriptions.anneeUniversitaire
+      annee_entree_etablissement: apprenant.premieresInscriptions.anneeEtablissement
+      code_categorie_socioprofessionnelle: apprenant.profession.code
+      code_quotite_travaillee: apprenant.quotite.code
+      code_categorie_socioprofessionnelle_parent1: apprenant.parent1.code
+      code_categorie_socioprofessionnelle_parent2: apprenant.parent2.code
+      code_situation_familiale: apprenant.situationPersonnelle.situationFamiliale.code
+      nombre_enfants: apprenant.situationPersonnelle.nbrEnfants
+      code_situation_militaire: apprenant.situationPersonnelle.situationMilitaire.code
+      #date_creation:
+      #date_modification:
+      code_premiere_specialite_bac: apprenant.bac.specialiteBac1.code
+      code_deuxieme_specialite_bac: apprenant.bac.specialiteBac2.code
+      #statut_ine:
+      #date_derniere_verification_ine:
+      #code_erreur_ine:
+      #message_erreur_ine:
+      temoin_neo_bachelier: temoinNeoBachelier
