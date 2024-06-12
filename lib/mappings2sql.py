@@ -23,9 +23,10 @@ if args.mappings:
 source_schema = data["schema_source"]
 dest_schema = data["schema_destination"]
 
-for (table_name, table) in data["tables"].items():
+for (dest_table, table) in data["tables"].items():
     if table is None: continue
 
+    source_table = table.get("source", dest_table)
     definitions = table.get("definitions", {})
     mappings = table.get("mappings", {})
 
@@ -46,7 +47,7 @@ for (table_name, table) in data["tables"].items():
 
     colnames = [col["name"] for col in cols.values()]
     coldefs = ["%s %s" % (col["name"], col["definition"]) for col in cols.values()]
-    print("create table %s.%s (\n  %s\n);" % (dest_schema, table_name, "\n, ".join(coldefs)))
+    print("create table %s.%s (\n  %s\n);" % (dest_schema, dest_table, "\n, ".join(coldefs)))
 
     exprs = []
     for col in cols.values():
@@ -69,10 +70,11 @@ for (table_name, table) in data["tables"].items():
             expr = "(%s)::%s" % (expr, cast)
         if sql is not None:
             expr = sql % dict(expr=expr)
+            expr = "(%s)" % expr
         exprs.append("%s as %s" % (expr, name))
     print("insert into %s.%s (%s) select\n  %s\nfrom %s.%s;" % (
-        dest_schema, table_name,
+        dest_schema, dest_table,
         ", ".join(colnames),
         "\n, ".join(exprs),
-        source_schema, table_name,
+        source_schema, source_table,
     ))

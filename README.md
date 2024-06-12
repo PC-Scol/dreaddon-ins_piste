@@ -1,13 +1,33 @@
 # dreaddon-ins_piste
 
 Cet addon crée un schéma `schema_ins_piste` et des extractions à partir du
-schéma `schema_piste_inscription`, en suivant les règles contenues dans le
-fichier `mappings.yml`:
-* pour chaque table de la clé mappings, la créer dans le schéma
-  `schema_ins_piste` avec une colonne pour chaque mapping.
-* pour chaque table, provisionner les colonnes de la table dans le schéma
-  `schema_ins_piste` avec le chemin calculé à partir de la colonne `source_json`
-  de la table dans le schéma `schema_piste_inscription`
+schéma `mongo_piste_inscription`
+
+Il montre aussi comment faire pour faire des extractions "simples" en suivant
+les règles contenues dans le fichier `mappings.yml`:
+* `schema_source` indique depuis quel schéma les données json sont récupérées
+* `schema_destination` indique dans quel schéma les tables sont provisionnées
+* pour chaque table de la clé `tables`, la créer dans le schéma destination avec
+  les colonnes de la clé `definitions`. si une colonne est mentionné dans
+  `mappings` mais pas dans `definitions`, elle est créée avec le type "varchar"
+* pour chaque table, provisionner les colonnes listées dans `mappings` avec la
+  clé spécifiée, extraite de la colonne `source_json` de la table du même nom
+  dans le schéma source.
+* il est possible de sélectionner une table source de nom différent de la table
+  destination avec la clé `source` e.g
+  ~~~yaml
+  tables:
+    latabledest:
+      source: latablesource
+      mappings:
+        colonne: objet.code.value
+  ~~~
+
+Dans les définitions de mappings, une clé `a.b.c` sera transformée en
+`source_json->'a'->'b'->>'c'`
+
+Consulter le fichier `mappings.yml` livré pour un exemple de mapping plus
+complexe (cf par exemple le mapping de `type_etablissement_bac`)
 
 Pour utiliser cet addon, rajouter ceci dans la configuration:
 ~~~sh
@@ -19,7 +39,8 @@ PC-Scol/dreaddon-ins_piste.git
 ~~~
 
 Pour changer les règles, faites une copie de ce dépôt, modifiez `mappings.yml`,
-puis indiquez votre dépôt privé dans la configuration:
+décommentez la commande dans le fichier `updates/create-mappings.sh` puis
+indiquez votre dépôt privé dans la configuration:
 ~~~sh
 ADDON_URLS="
 ...
