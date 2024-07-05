@@ -84,7 +84,10 @@ set
     prenom2 = source_json->'apprenant'->'etatCivil'->'deuxiemePrenom'->>'value',
     prenom3 = source_json->'apprenant'->'etatCivil'->'troisiemePrenom'->>'value',
     sexe = source_json->'apprenant'->'etatCivil'->>'genre',
-    date_naissance = (source_json->'apprenant'->'etatCivil'->'dateDeNaissance'->'value'->>'$date')::date,
+    date_naissance = CASE  
+		WHEN (source_json->'apprenant'->'etatCivil'->'dateDeNaissance'->'value'->>'$date') LIKE '%numberLong%' THEN NULL::date
+		ELSE (source_json->'apprenant'->'etatCivil'->'dateDeNaissance'->'value'->>'$date')::date
+	END,
     code_pays_naissance = source_json->'apprenant'->'etatCivil'->'paysDeNaissance'->>'code',
     code_commune_naissance = source_json->'apprenant'->'etatCivil'->'communeDeNaissance'->>'code',
     libelle_commune_naissance = source_json->'apprenant'->'etatCivil'->'communeDeNaissance'->>'libelle',
