@@ -3,8 +3,17 @@
 Cet addon crée un schéma `schema_ins_piste` et des extractions à partir du
 schéma `mongo_piste_inscription`
 
-Il montre aussi comment faire pour faire des extractions "simples" en suivant
-les règles contenues dans le fichier `mappings.yml`:
+Pour utiliser cet addon, rajouter ceci dans la configuration:
+~~~sh
+ADDON_URLS="
+...
+PC-Scol/dreaddon-ins_piste.git
+...
+"
+~~~
+
+Cet addon montre aussi comment faire pour faire des extractions "simples" en
+suivant les règles contenues dans un fichier `mappings.yml`:
 * `schema_source` indique depuis quel schéma les données json sont récupérées
 * `schema_destination` indique dans quel schéma les tables sont provisionnées
 * pour chaque table de la clé `tables`, la créer dans le schéma destination avec
@@ -17,8 +26,8 @@ les règles contenues dans le fichier `mappings.yml`:
   destination avec la clé `source` e.g
   ~~~yaml
   tables:
-    latabledest:
-      source: latablesource
+    tabledest:
+      source: tablesource
       mappings:
         colonne: objet.code.value
   ~~~
@@ -28,15 +37,6 @@ Dans les définitions de mappings, une clé `a.b.c` sera transformée en
 
 Consulter le fichier `mappings.yml` livré pour un exemple de mapping plus
 complexe (cf par exemple le mapping de `type_etablissement_bac`)
-
-Pour utiliser cet addon, rajouter ceci dans la configuration:
-~~~sh
-ADDON_URLS="
-...
-PC-Scol/dreaddon-ins_piste.git
-...
-"
-~~~
 
 Pour changer les règles, faites une copie de ce dépôt, modifiez `mappings.yml`,
 décommentez la commande dans le fichier `updates/create-mappings.sh` puis
